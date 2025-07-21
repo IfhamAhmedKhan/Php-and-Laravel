@@ -139,6 +139,24 @@
     }
 
     sayHello();
+    echo "<br>";
 
     // With Parameter
+    function greet($name = "Guest"){
+        echo "Good morning {$name}!<br>";
+    }
+    echo "<br>";
+    greet();
+    greet("Afnan");
+
+    // Return from function
+
+    function multiply($a,$b){
+        return $a*$b;
+    }
+    $result = multiply(4,3);
+    echo "The result of multiplication is {$result}";
+    echo "<br>";
+
+    
 ?>
