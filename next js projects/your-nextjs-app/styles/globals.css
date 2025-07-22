@@ -1,0 +1,263 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom App styles for sidebar layout */
+.App {
+  text-align: center;
+  display: flex;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  position: relative;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.App-navbar {
+  background-color: #20232a;
+  padding: 2rem 0;
+  min-height: 100vh;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.App-navbar ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.App-navbar li {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.App-navbar a {
+  color: #61dafb;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+  padding: 0.5rem 1.5rem;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.App-navbar a:hover {
+  color: #21a1f3;
+  background: #282c34;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.main-btn {
+  padding: 1.5rem 3rem;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #61dafb;
+  color: #20232a;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.main-btn:hover {
+  background-color: #21a1f3;
+  color: #fff;
+}
+
+.slider-placeholder {
+  width: 80%;
+  height: 300px;
+  background: #444950;
+  border-radius: 16px;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  font-size: 2rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.navbar-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #61dafb;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.navbar-toggle-open {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: #20232a;
+  border: none;
+  color: #61dafb;
+  font-size: 2.2rem;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.profile-container {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  z-index: 10;
+}
+
+.profile-btn {
+  background: #20232a;
+  border: none;
+  color: #61dafb;
+  font-size: 2rem;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background 0.2s;
+}
+
+.profile-btn:hover {
+  background: #282c34;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 56px;
+  right: 0;
+  background: #20232a;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  min-width: 180px;
+  padding: 0.5rem 0;
+  color: #fff;
+}
+
+.profile-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-dropdown li {
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-dropdown li:hover {
+  background: #282c34;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive styles for sidebar */
+@media (max-width: 900px) {
+  .App {
+    flex-direction: column;
+  }
+  .App-navbar {
+    width: 100vw;
+    min-height: unset;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 1rem 0;
+    position: relative;
+  }
+  .App-navbar ul {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: space-around;
+  }
+  .App-navbar li {
+    margin: 0 1rem;
+    width: auto;
+  }
+  .App-navbar a {
+    text-align: center;
+    padding: 0.5rem 1rem;
+  }
+}
