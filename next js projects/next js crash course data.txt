@@ -1,0 +1,64 @@
+// if you prefer using pnpm fast and more efficient
+pnpm create next-app my-next-app
+
+// if you want latest
+npx create-next-app@latest
+
+then press y 
+
+typescript = yes
+ESlint = yes
+Tailwind CSS = yes
+src/directory = no
+app router = yes
+turbopack = yes
+import alias = no
+
+-> tsconfig.json 
+This is configuration file. What rules to follow and typechecked.
+
+-> always put images in public folder
+
+-> primary homepage is located in app folder (page.tsx)
+this is the main page that you see first.
+
+-> for running the project: npm run dev
+
+HMR -> hot module replacement help you reload page fast
+
+-> favicon.ico is the website tab logo
+
+-> globals.css help you write custom css or import tailwind css
+
+-> layout.tsx is a file in which you make changes and it's applied to all the other pages as well.
+
+Client and server component
+Every component you create by default next js converts it into server component
+
+Server component -> 
+Rendered on the server, then HTML is sent to the browser.
+Great for static pages, data fetching, SEO
+No javascript sent to the client for these components and it's faster initial load
+
+Client component -> 
+Rendered in the browser. JS is sent to client so it supports interactivity.
+When you need interactivity like onClick, useState, useEffect
+for using this we add "use client" at top of our component.
+
+React fragment -> <></> this is used to enter multiple tag in main page.tsx
+
+JSX element <Hello/>
+
+note: server components are rendered on server side but client components are pre-rendered on server site
+
+Topic -> Routing
+rafce to create short function 
+Routing means you make page.tsx for each page you create. 
+You can also create multiple stuff like a dashboard that contain its page.tsx and also two more folder like user and analytics and they both contain page.tsx
+
+Dynamic routing is when we want our website to make changes in its link by user input for example a user1 logins but now it can any user we wont make several pages like that so what we want is dynamic routing.
+
+Topic -> Layout
+layout.tsx act as parent of all tsx files
+
+
