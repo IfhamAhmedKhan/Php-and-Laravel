@@ -60,5 +60,22 @@ Dynamic routing is when we want our website to make changes in its link by user 
 
 Topic -> Layout
 layout.tsx act as parent of all tsx files
+You can add layout to different pages and all the childs of that folder will have this one thing you add in the layout
+
+Topic -> Route Grouping
+You use () parenthesis on your folder name so that main root layout won't effect those 
+for example you need different nav bar for main page and dashboard
+allow you to create folder without effecting the url
+
+Topic -> throw error
+throw new Error("Your error")// display error message on that page.tsx file when accessed
+
+Topic -> Loading UIs . You can make loading.tsx and add loading bar or cursor or anything you want to display while page is being load
+
+Topic -> Data fetching you can access data using export default async function Home(){
+	const response = await fetch("https://jsonplaceholder.typicode.com/albums");
+}
+
+Topic -> APIRoutes
 
 
