@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.welcome {
+  font-family: 'Dancing Script', cursive, sans-serif;
+  font-size: 2.2rem;
+  color: #f59e42;
+  margin: 1.5rem 0 1rem 0;
+  animation: fadeInScale 1.2s;
+}
+
+@keyframes fadeInScale {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.cardGrid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(245,158,66,0.10);
+  padding: 1.5rem;
+  width: 260px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(245,158,66,0.18);
+}
+.cardImg {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+.price {
+  color: #f59e42;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+} 
