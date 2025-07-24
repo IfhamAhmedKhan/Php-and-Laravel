@@ -57,6 +57,57 @@ const allItems = [...pcItems, ...laptopItems];
 export default function Home() {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<typeof allItems | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
+  const [error, setError] = useState<string | null>(null);
+  const countryCodes = ['+1', '+44', '+91', '+92', '+61', '+81', '+49', '+33'];
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone: string) => /^\d{10,15}$/.test(phone);
+  const validateName = (name: string) => name.length > 0 && name.length <= 15;
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleProceed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!validateName(form.name)) {
+      setError('Name must be 1-15 characters.'); return;
+    }
+    if (!form.address || form.address.length < 5) {
+      setError('Address is required.'); return;
+    }
+    if (!validateEmail(form.email)) {
+      setError('Invalid email format.'); return;
+    }
+    if (!validatePhone(form.phone)) {
+      setError('Invalid phone number.'); return;
+    }
+    try {
+      const res = await fetch('/api/submit-form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          address: form.address,
+          payment: form.payment,
+          phone: form.country + form.phone,
+          email: form.email
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Submission failed.');
+        return;
+      }
+      setShowForm(false);
+      setSelectedIdx(null);
+      setForm({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
+      alert('Order placed!');
+    } catch (e) {
+      setError('Server error.');
+    }
+  };
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -69,7 +120,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <button onClick={() => router.back()} style={{ margin: "1rem 0", padding: "0.5rem 1.2rem", borderRadius: 8, border: "none", background: "#4f8cff", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: "1rem" }}>Go Back</button>
+      <button onClick={() => router.push('/')} style={{ margin: "1rem 0", padding: "0.5rem 1.2rem", borderRadius: 8, border: "none", background: "#4f8cff", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: "1rem" }}>Go Back</button>
       <h1>Home Page</h1>
       <h2 className={styles.welcome}>Welcome to the Home page!</h2>
       <p>Enjoy exploring our site.</p>
@@ -93,7 +144,7 @@ export default function Home() {
             ) : (
               <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap", justifyContent: "center" }}>
                 {results.map((item, idx) => (
-                  <div key={idx} style={{ background: "#fff", borderRadius: 16, boxShadow: "0 4px 24px rgba(99,102,241,0.10)", padding: "1.5rem", width: 260, textAlign: "center" }}>
+                  <div key={idx} style={{ background: "#fff", borderRadius: 16, boxShadow: "0 4px 24px rgba(99,102,241,0.10)", padding: "1.5rem", width: 260, textAlign: "center", cursor: 'pointer' }} onClick={() => setSelectedIdx(idx)}>
                     <img src={item.image} alt={item.name} style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 10, marginBottom: 16 }} />
                     <h3>{item.name}</h3>
                     <p style={{ color: item.category === "PC" ? "#4f8cff" : "#f59e42", fontWeight: "bold", fontSize: "1.1rem", margin: "0.5rem 0" }}>{item.price}</p>
@@ -101,6 +152,44 @@ export default function Home() {
                     <span style={{ fontSize: 13, color: "#888" }}>{item.category}</span>
                   </div>
                 ))}
+              </div>
+            )}
+            {selectedIdx !== null && results && results[selectedIdx] && (
+              <div className={styles.overlay} onClick={() => { setSelectedIdx(null); setShowForm(false); }}>
+                <div className={styles.expandedCard} onClick={e => e.stopPropagation()}>
+                  <img src={results[selectedIdx].image} alt={results[selectedIdx].name} style={{width: '100%', height: 220, objectFit: 'cover', borderRadius: 12, marginBottom: 16}} />
+                  <h2>{results[selectedIdx].name}</h2>
+                  <p style={{color: results[selectedIdx].category === 'PC' ? '#4f8cff' : '#f59e42', fontWeight: 'bold', fontSize: '1.4rem'}}>{results[selectedIdx].price}</p>
+                  <p style={{margin: '1rem 0'}}>{results[selectedIdx].details}</p>
+                  <span style={{ fontSize: 15, color: '#888', display: 'block', marginBottom: 16 }}>{results[selectedIdx].category}</span>
+                  {!showForm ? (
+                    <>
+                      <button style={{padding: '0.7rem 2rem', background: results[selectedIdx].category === 'PC' ? '#4f8cff' : '#f59e42', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}} onClick={() => setShowForm(true)}>Buy Now</button>
+                      <button onClick={() => setSelectedIdx(null)} style={{marginLeft: 16, padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Close</button>
+                    </>
+                  ) : (
+                    <form onSubmit={handleProceed} style={{marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16}}>
+                      {error && <div style={{color: 'red', fontWeight: 600}}>{error}</div>}
+                      <input name="name" value={form.name} onChange={handleFormChange} placeholder="Your Name" required maxLength={15} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                      <input name="address" value={form.address} onChange={handleFormChange} placeholder="Address" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                      <select name="payment" value={form.payment} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}}>
+                        <option value="online">Online</option>
+                        <option value="cod">Cash on Delivery</option>
+                      </select>
+                      <div style={{display: 'flex', gap: 8}}>
+                        <select name="country" value={form.country} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc', width: 90}}>
+                          {countryCodes.map(code => <option key={code} value={code}>{code}</option>)}
+                        </select>
+                        <input name="phone" value={form.phone} onChange={handleFormChange} placeholder="Phone Number" required style={{flex: 1, padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                      </div>
+                      <input name="email" value={form.email} onChange={handleFormChange} placeholder="Email Address" type="email" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                      <div style={{display: 'flex', gap: 16, marginTop: 8}}>
+                        <button type="submit" style={{padding: '0.7rem 2rem', background: results[selectedIdx].category === 'PC' ? '#4f8cff' : '#f59e42', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}}>Proceed</button>
+                        <button type="button" onClick={() => setShowForm(false)} style={{padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Not Now</button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               </div>
             )}
           </div>

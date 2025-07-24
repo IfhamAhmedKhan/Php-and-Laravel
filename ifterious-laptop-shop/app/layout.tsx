@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "../components/Footer";
+import NavBar from "../components/NavBar";
 import React from "react";
 
 const geistSans = Geist({
@@ -27,44 +28,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Lobster&family=Orbitron:wght@500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Pacifico&family=Lobster&family=Orbitron:wght@500&family=Dancing+Script:wght@700&display=swap"
+          rel="stylesheet"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ position: "relative", minHeight: "100vh", overflowX: "hidden" }}
       >
         {/* Background YouTube Video */}
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          minWidth: "100vw",
-          minHeight: "100vh",
-          maxWidth: "100vw",
-          maxHeight: "100vh",
-          zIndex: 0,
-          overflow: "hidden",
-          pointerEvents: "none"
-        }}>
+        <div
+          className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none"
+        >
           <iframe
-            width="100vw"
-            height="100vh"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              minWidth: "100vw",
-              minHeight: "100vh",
-              maxWidth: "100vw",
-              maxHeight: "100vh",
-              objectFit: "cover",
-              zIndex: 0,
-              pointerEvents: "none"
-            }}
+            width="100%"
+            height="100%"
+            className="absolute top-0 left-0 w-full h-full object-cover"
             src="https://www.youtube.com/embed/9_FQW36r0n8?autoplay=1&mute=1&loop=1&playlist=9_FQW36r0n8&controls=0&showinfo=0&modestbranding=1&rel=0"
             title="Background Video"
             frameBorder="0"
@@ -72,9 +53,15 @@ export default function RootLayout({
             allowFullScreen
           />
         </div>
-        {/* Main Content Overlay */}
-        <div style={{ position: "relative", zIndex: 1, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-          {children}
+
+        {/* Foreground Content */}
+        <div
+          className="relative z-10 flex flex-col min-h-screen responsive-padding"
+        >
+          <NavBar />
+          <main className="flex-grow">
+            {children}
+          </main>
           <Footer />
         </div>
       </body>
