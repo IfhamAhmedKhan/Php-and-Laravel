@@ -47,6 +47,9 @@ export default function Laptop() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
   const [error, setError] = useState<string | null>(null);
+  const [showCardForm, setShowCardForm] = useState(false);
+  const [card, setCard] = useState({ cardName: '', cardNumber: '', expiry: '', cvv: '' });
+  const [cardError, setCardError] = useState<string | null>(null);
   const countryCodes = ['+1', '+44', '+91', '+92', '+61', '+81', '+49', '+33'];
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone: string) => /^\d{10,15}$/.test(phone);
@@ -54,21 +57,30 @@ export default function Laptop() {
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCard({ ...card, [e.target.name]: e.target.value });
+  };
+  const validateCard = () => {
+    if (!card.cardName || card.cardName.length > 26) return 'Cardholder name required (max 26 chars)';
+    if (!/^\d{16}$/.test(card.cardNumber)) return 'Card number must be 16 digits';
+    if (!/^\d{2}\/\d{2}$/.test(card.expiry)) return 'Expiry must be MM/YY';
+    if (!/^\d{3,4}$/.test(card.cvv)) return 'CVV must be 3 or 4 digits';
+    return null;
+  };
   const handleProceed = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!validateName(form.name)) {
-      setError('Name must be 1-15 characters.'); return;
+    if (!validateName(form.name)) { setError('Name must be 1-15 characters.'); return; }
+    if (!form.address || form.address.length < 5) { setError('Address is required.'); return; }
+    if (!validateEmail(form.email)) { setError('Invalid email format.'); return; }
+    if (!validatePhone(form.phone)) { setError('Invalid phone number.'); return; }
+    if (form.payment === 'online') {
+      setShowCardForm(true);
+      return;
     }
-    if (!form.address || form.address.length < 5) {
-      setError('Address is required.'); return;
-    }
-    if (!validateEmail(form.email)) {
-      setError('Invalid email format.'); return;
-    }
-    if (!validatePhone(form.phone)) {
-      setError('Invalid phone number.'); return;
-    }
+    await submitOrder();
+  };
+  const submitOrder = async () => {
     try {
       const res = await fetch('/api/submit-form', {
         method: 'POST',
@@ -78,7 +90,8 @@ export default function Laptop() {
           address: form.address,
           payment: form.payment,
           phone: form.country + form.phone,
-          email: form.email
+          email: form.email,
+          ...(form.payment === 'online' ? { card } : {})
         })
       });
       const data = await res.json();
@@ -87,12 +100,21 @@ export default function Laptop() {
         return;
       }
       setShowForm(false);
+      setShowCardForm(false);
       setSelectedIdx(null);
       setForm({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
+      setCard({ cardName: '', cardNumber: '', expiry: '', cvv: '' });
       alert('Order placed!');
     } catch (e) {
       setError('Server error.');
     }
+  };
+  const handleCardSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCardError(null);
+    const err = validateCard();
+    if (err) { setCardError(err); return; }
+    await submitOrder();
   };
   return (
     <div className={styles.container}>
@@ -122,26 +144,41 @@ export default function Laptop() {
                 <button onClick={() => setSelectedIdx(null)} style={{marginLeft: 16, padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Close</button>
               </>
             ) : (
-              <form onSubmit={handleProceed} style={{marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16}}>
-                {error && <div style={{color: 'red', fontWeight: 600}}>{error}</div>}
-                <input name="name" value={form.name} onChange={handleFormChange} placeholder="Your Name" required maxLength={15} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
-                <input name="address" value={form.address} onChange={handleFormChange} placeholder="Address" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
-                <select name="payment" value={form.payment} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}}>
-                  <option value="online">Online</option>
-                  <option value="cod">Cash on Delivery</option>
-                </select>
-                <div style={{display: 'flex', gap: 8}}>
-                  <select name="country" value={form.country} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc', width: 90}}>
-                    {countryCodes.map(code => <option key={code} value={code}>{code}</option>)}
+              <>
+                <form onSubmit={handleProceed} style={{marginTop: 24, display: showCardForm ? 'none' : 'flex', flexDirection: 'column', gap: 16}}>
+                  {error && <div style={{color: 'red', fontWeight: 600}}>{error}</div>}
+                  <input name="name" value={form.name} onChange={handleFormChange} placeholder="Your Name" required maxLength={15} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                  <input name="address" value={form.address} onChange={handleFormChange} placeholder="Address" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                  <select name="payment" value={form.payment} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}}>
+                    <option value="online">Online</option>
+                    <option value="cod">Cash on Delivery</option>
                   </select>
-                  <input name="phone" value={form.phone} onChange={handleFormChange} placeholder="Phone Number" required style={{flex: 1, padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
-                </div>
-                <input name="email" value={form.email} onChange={handleFormChange} placeholder="Email Address" type="email" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
-                <div style={{display: 'flex', gap: 16, marginTop: 8}}>
-                  <button type="submit" style={{padding: '0.7rem 2rem', background: '#f59e42', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}}>Proceed</button>
-                  <button type="button" onClick={() => setShowForm(false)} style={{padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Not Now</button>
-                </div>
-              </form>
+                  <div style={{display: 'flex', gap: 8}}>
+                    <select name="country" value={form.country} onChange={handleFormChange} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc', width: 90}}>
+                      {countryCodes.map(code => <option key={code} value={code}>{code}</option>)}
+                    </select>
+                    <input name="phone" value={form.phone} onChange={handleFormChange} placeholder="Phone Number" required style={{flex: 1, padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                  </div>
+                  <input name="email" value={form.email} onChange={handleFormChange} placeholder="Email Address" type="email" required style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                  <div style={{display: 'flex', gap: 16, marginTop: 8}}>
+                    <button type="submit" style={{padding: '0.7rem 2rem', background: '#f59e42', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}}>Proceed</button>
+                    <button type="button" onClick={() => setShowForm(false)} style={{padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Not Now</button>
+                  </div>
+                </form>
+                {showCardForm && (
+                  <form onSubmit={handleCardSubmit} style={{marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16}}>
+                    {cardError && <div style={{color: 'red', fontWeight: 600}}>{cardError}</div>}
+                    <input name="cardName" value={card.cardName} onChange={handleCardChange} placeholder="Cardholder Name" required maxLength={26} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                    <input name="cardNumber" value={card.cardNumber} onChange={handleCardChange} placeholder="Card Number" required maxLength={16} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                    <input name="expiry" value={card.expiry} onChange={handleCardChange} placeholder="MM/YY" required maxLength={5} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                    <input name="cvv" value={card.cvv} onChange={handleCardChange} placeholder="CVV" required maxLength={4} style={{padding: 10, borderRadius: 6, border: '1px solid #ccc'}} />
+                    <div style={{display: 'flex', gap: 16, marginTop: 8}}>
+                      <button type="submit" style={{padding: '0.7rem 2rem', background: '#f59e42', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}}>Place Order</button>
+                      <button type="button" onClick={() => { setShowCardForm(false); setCard({ cardName: '', cardNumber: '', expiry: '', cvv: '' }); }} style={{padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Cancel</button>
+                    </div>
+                  </form>
+                )}
+              </>
             )}
           </div>
         </div>

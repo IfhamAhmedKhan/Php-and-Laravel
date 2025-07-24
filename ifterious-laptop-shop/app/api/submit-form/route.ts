@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'orders.json');
+import clientPromise, { dbName } from './mongo';
 
 function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -21,7 +17,7 @@ function validateName(name: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, address, payment, phone, email } = body;
+    const { name, address, payment, phone, email, card } = body;
 
     if (!validateName(name)) {
       return NextResponse.json({ error: 'Name must be 1-15 characters.' }, { status: 400 });
@@ -39,23 +35,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment option.' }, { status: 400 });
     }
 
-    // Ensure data directory exists
-    try {
-      await fs.mkdir(DATA_DIR, { recursive: true });
-    } catch (e) {}
-
-    let orders = [];
-    try {
-      const file = await fs.readFile(DATA_FILE, 'utf-8');
-      orders = JSON.parse(file);
-      if (!Array.isArray(orders)) orders = [];
-    } catch (e) {
-      orders = [];
+    // Save to MongoDB
+    const client = await clientPromise;
+    const db = client.db(dbName);
+    const order = { name, address, payment, phone, email, date: new Date().toISOString() };
+    if (payment === 'online' && card) {
+      order['card'] = card;
     }
-
-    const newOrder = { name, address, payment, phone, email, date: new Date().toISOString() };
-    orders.push(newOrder);
-    await fs.writeFile(DATA_FILE, JSON.stringify(orders, null, 2), 'utf-8');
+    await db.collection('orders').insertOne(order);
 
     return NextResponse.json({ success: true });
   } catch (e) {
