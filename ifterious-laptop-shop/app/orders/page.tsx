@@ -199,6 +199,33 @@ const orderTotalStyle: React.CSSProperties = {
   borderTop: "1px solid #e5e7eb",
 };
 
+const cancelButtonStyle: React.CSSProperties = {
+  marginTop: "1rem",
+  padding: "0.5rem 1rem",
+  borderRadius: "6px",
+  border: "none",
+  background: "#ef4444",
+  color: "#fff",
+  fontWeight: "600",
+  cursor: "pointer",
+  fontSize: "0.9rem",
+  transition: "all 0.2s",
+  width: "100%",
+};
+
+const cancelButtonHoverStyle: React.CSSProperties = {
+  background: "#dc2626",
+  transform: "translateY(-1px)",
+  boxShadow: "0 4px 12px rgba(239,68,68,0.3)",
+};
+
+const cancelButtonDisabledStyle: React.CSSProperties = {
+  background: "#9ca3af",
+  cursor: "not-allowed",
+  transform: "none",
+  boxShadow: "none",
+};
+
 const loadingStyle: React.CSSProperties = {
   textAlign: "center",
   padding: "4rem 2rem",
@@ -215,7 +242,7 @@ interface Order {
   email: string;
   userId: string;
   createdAt: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   productName?: string;
   productPrice?: string;
   productDetails?: string;
@@ -231,6 +258,12 @@ const getStatusStyle = (status: string) => {
       return statusShippedStyle;
     case 'delivered':
       return statusDeliveredStyle;
+    case 'cancelled':
+      return {
+        ...statusPendingStyle,
+        background: "#ef4444",
+        color: "#fff",
+      };
     default:
       return statusPendingStyle;
   }
@@ -253,6 +286,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [cancellingOrder, setCancellingOrder] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -278,6 +312,46 @@ export default function OrdersPage() {
 
     fetchOrders();
   }, [user, router]);
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (!user) return;
+    
+    setCancellingOrder(orderId);
+    
+    try {
+      const response = await fetch('/api/orders/cancel', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: orderId,
+          userId: user._id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the order status in the local state
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order._id === orderId 
+              ? { ...order, status: 'cancelled' as const }
+              : order
+          )
+        );
+        alert('Order cancelled successfully!');
+      } else {
+        alert(data.error || 'Failed to cancel order');
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      alert('Failed to cancel order. Please try again.');
+    } finally {
+      setCancellingOrder(null);
+    }
+  };
 
   if (!user) {
     return null; // Will redirect to login
@@ -395,6 +469,25 @@ export default function OrdersPage() {
                 <div style={orderTotalStyle}>
                   Order Total: {order.productPrice || 'Contact for pricing'}
                 </div>
+                
+                {/* Cancel Button - only show for orders that can be cancelled */}
+                {order.status !== 'cancelled' && order.status !== 'delivered' && order.status !== 'shipped' && (
+                  <button
+                    onClick={() => handleCancelOrder(order._id)}
+                    disabled={cancellingOrder === order._id}
+                    style={
+                      cancellingOrder === order._id
+                        ? { ...cancelButtonStyle, ...cancelButtonDisabledStyle }
+                        : hovered === `cancel-${order._id}`
+                        ? { ...cancelButtonStyle, ...cancelButtonHoverStyle }
+                        : cancelButtonStyle
+                    }
+                    onMouseEnter={() => setHovered(`cancel-${order._id}`)}
+                    onMouseLeave={() => setHovered(null)}
+                  >
+                    {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel Order'}
+                  </button>
+                )}
               </div>
             ))}
           </div>

@@ -23,22 +23,22 @@ const pcItems = [
   {
     name: "Gaming Laptop Studio",
     price: "$1500",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
+    image: "https://homepoint.pk/media/catalog/product/cache/3ed5cb5229c25b4543902f9f11a53344/l/e/legion-7-core-i9-pakistan.jpg",
     details: "Intel i9, 32GB RAM, RTX 3080, 2TB SSD",
     category: "Gaming Laptop",
   },
   {
     name: "Gaming Laptop Lite",
     price: "$700",
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+    image: "https://www.mega.pk/items_images/Acer+Nitro+5+Core+i5+11th+Generation+8GB+RAM+512GB+SSD+4GB+GTX+1650+GPU+FHD+Windows+11+Price+in+Pakistan%2C+Specifications%2C+Features_-_23501.webp",
     details: "Intel i5, 8GB RAM, GTX 1650, 512GB SSD",
     category: "Gaming Laptop",
   },
   {
     name: "Gaming Laptop Silent",
     price: "$950",
-    image: "https://images.unsplash.com/photo-1515168833906-d2a3b82b3029?auto=format&fit=crop&w=400&q=80",
-    details: "Intel i5, 16GB RAM, Integrated Graphics, 1TB SSD",
+    image: "https://static.webx.pk/files/4012/Images/71xhyajsgxl.-ac-sl1500--4012-2123556-281124105945909.jpg",
+    details: "Intel i5, 16GB RAM, RTX 3050, 1TB SSD",
     category: "Gaming Laptop",
   },
 ];

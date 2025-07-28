@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useUser } from "../contexts/UserContext";
 import { useRouter } from "next/navigation";
@@ -152,7 +153,14 @@ const NavBar = () => {
   return (
     <nav style={navStyle}>
       <Link href="/home" style={logoStyle}>
-        <span role="img" aria-label="laptop">💻</span> Iterious
+        <Image 
+          src="/main-logo.png" 
+          alt="Iterious Laptop Store Logo" 
+          width={32} 
+          height={32} 
+          style={{ objectFit: "contain" }}
+        />
+        <span>Iterious</span>
         <span style={{ color: "#f59e42", fontWeight: 900 }}>Laptop Store</span>
       </Link>
       <ul style={ulStyle}>
