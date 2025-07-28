@@ -55,11 +55,9 @@ export default function RootLayout({
         </div>
 
         {/* Foreground Content */}
-        <div
-          className="relative z-10 flex flex-col min-h-screen responsive-padding"
-        >
+        <div className="relative z-10 flex flex-col min-h-screen">
           <NavBar />
-          <main className="flex-grow">
+          <main className="flex-grow responsive-padding">
             {children}
           </main>
           <Footer />
