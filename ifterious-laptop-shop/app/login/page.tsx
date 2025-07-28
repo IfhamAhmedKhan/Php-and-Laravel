@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "../../contexts/UserContext";
 
 const loginContainerStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -88,6 +90,13 @@ const loginButtonStyle: React.CSSProperties = {
 const loginButtonHoverStyle: React.CSSProperties = {
   transform: "translateY(-2px)",
   boxShadow: "0 8px 25px rgba(79,140,255,0.3)",
+};
+
+const loginButtonDisabledStyle: React.CSSProperties = {
+  background: "#ccc",
+  cursor: "not-allowed",
+  transform: "none",
+  boxShadow: "none",
 };
 
 const forgotPasswordStyle: React.CSSProperties = {
@@ -180,13 +189,39 @@ const checkboxLabelStyle: React.CSSProperties = {
   color: "#666",
 };
 
+const messageStyle: React.CSSProperties = {
+  padding: "12px 16px",
+  borderRadius: "8px",
+  marginBottom: "1rem",
+  fontSize: "0.9rem",
+  fontWeight: "500",
+};
+
+const successMessageStyle: React.CSSProperties = {
+  ...messageStyle,
+  background: "#d1fae5",
+  color: "#065f46",
+  border: "1px solid #a7f3d0",
+};
+
+const errorMessageStyle: React.CSSProperties = {
+  ...messageStyle,
+  background: "#fee2e2",
+  color: "#991b1b",
+  border: "1px solid #fecaca",
+};
+
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useUser();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
   const [hovered, setHovered] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -194,12 +229,62 @@ export default function LoginPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // Clear message when user starts typing
+    if (message) setMessage(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", formData);
+    
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Login successful! Redirecting to home...' });
+        
+        // Use the context login function
+        login(data.user);
+        
+        // Store user data in localStorage if remember me is checked
+        if (formData.rememberMe) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        } else {
+          sessionStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
+        // Clear form
+        setFormData({
+          email: "",
+          password: "",
+          rememberMe: false,
+        });
+        
+        // Redirect to home page after 1.5 seconds
+        setTimeout(() => {
+          router.push('/home');
+        }, 1500);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Invalid email or password!' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -207,6 +292,12 @@ export default function LoginPage() {
       <div style={loginCardStyle}>
         <h1 style={titleStyle}>Welcome Back</h1>
         <p style={subtitleStyle}>Sign in to your account</p>
+        
+        {message && (
+          <div style={message.type === 'success' ? successMessageStyle : errorMessageStyle}>
+            {message.text}
+          </div>
+        )}
         
         <form style={formStyle} onSubmit={handleSubmit}>
           <div style={inputGroupStyle}>
@@ -222,6 +313,7 @@ export default function LoginPage() {
               style={inputStyle}
               placeholder="Enter your email"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -238,6 +330,7 @@ export default function LoginPage() {
               style={inputStyle}
               placeholder="Enter your password"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -249,6 +342,7 @@ export default function LoginPage() {
               checked={formData.rememberMe}
               onChange={handleInputChange}
               style={checkboxStyle}
+              disabled={isLoading}
             />
             <label style={checkboxLabelStyle} htmlFor="rememberMe">
               Remember me
@@ -257,15 +351,18 @@ export default function LoginPage() {
           
           <button
             type="submit"
+            disabled={isLoading}
             style={
-              hovered === "login"
+              isLoading
+                ? { ...loginButtonStyle, ...loginButtonDisabledStyle }
+                : hovered === "login"
                 ? { ...loginButtonStyle, ...loginButtonHoverStyle }
                 : loginButtonStyle
             }
-            onMouseEnter={() => setHovered("login")}
+            onMouseEnter={() => !isLoading && setHovered("login")}
             onMouseLeave={() => setHovered(null)}
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
         
@@ -300,6 +397,7 @@ export default function LoginPage() {
             onMouseEnter={() => setHovered("google")}
             onMouseLeave={() => setHovered(null)}
             type="button"
+            disabled={isLoading}
           >
             <span role="img" aria-label="google">🔍</span>
             Google
@@ -313,6 +411,7 @@ export default function LoginPage() {
             onMouseEnter={() => setHovered("facebook")}
             onMouseLeave={() => setHovered(null)}
             type="button"
+            disabled={isLoading}
           >
             <span role="img" aria-label="facebook">📘</span>
             Facebook

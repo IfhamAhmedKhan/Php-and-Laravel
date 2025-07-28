@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const signupContainerStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -88,6 +89,13 @@ const signupButtonStyle: React.CSSProperties = {
 const signupButtonHoverStyle: React.CSSProperties = {
   transform: "translateY(-2px)",
   boxShadow: "0 8px 25px rgba(79,140,255,0.3)",
+};
+
+const signupButtonDisabledStyle: React.CSSProperties = {
+  background: "#ccc",
+  cursor: "not-allowed",
+  transform: "none",
+  boxShadow: "none",
 };
 
 const checkboxContainerStyle: React.CSSProperties = {
@@ -187,7 +195,30 @@ const passwordMatchStyle: React.CSSProperties = {
   fontWeight: "500",
 };
 
+const messageStyle: React.CSSProperties = {
+  padding: "12px 16px",
+  borderRadius: "8px",
+  marginBottom: "1rem",
+  fontSize: "0.9rem",
+  fontWeight: "500",
+};
+
+const successMessageStyle: React.CSSProperties = {
+  ...messageStyle,
+  background: "#d1fae5",
+  color: "#065f46",
+  border: "1px solid #a7f3d0",
+};
+
+const errorMessageStyle: React.CSSProperties = {
+  ...messageStyle,
+  background: "#fee2e2",
+  color: "#991b1b",
+  border: "1px solid #fecaca",
+};
+
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -196,6 +227,8 @@ export default function SignupPage() {
     acceptTerms: false,
   });
   const [hovered, setHovered] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -203,20 +236,63 @@ export default function SignupPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // Clear message when user starts typing
+    if (message) setMessage(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setMessage({ type: 'error', text: 'Passwords do not match!' });
       return;
     }
+    
     if (!formData.acceptTerms) {
-      alert("Please accept the terms and conditions!");
+      setMessage({ type: 'error', text: 'Please accept the terms and conditions!' });
       return;
     }
-    // Handle signup logic here
-    console.log("Signup attempt:", formData);
+
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Account created successfully! Redirecting to login...' });
+        // Clear form
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          acceptTerms: false,
+        });
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Something went wrong!' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPasswordStrength = (password: string) => {
@@ -241,6 +317,12 @@ export default function SignupPage() {
         <h1 style={titleStyle}>Create Account</h1>
         <p style={subtitleStyle}>Join us and start shopping today</p>
         
+        {message && (
+          <div style={message.type === 'success' ? successMessageStyle : errorMessageStyle}>
+            {message.text}
+          </div>
+        )}
+        
         <form style={formStyle} onSubmit={handleSubmit}>
           <div style={inputGroupStyle}>
             <label style={labelStyle} htmlFor="username">
@@ -255,6 +337,7 @@ export default function SignupPage() {
               style={inputStyle}
               placeholder="Enter your username"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -271,6 +354,7 @@ export default function SignupPage() {
               style={inputStyle}
               placeholder="Enter your email"
               required
+              disabled={isLoading}
             />
           </div>
           
@@ -287,6 +371,7 @@ export default function SignupPage() {
               style={inputStyle}
               placeholder="Enter your password"
               required
+              disabled={isLoading}
             />
             {formData.password && (
               <div style={{ ...passwordStrengthStyle, color: passwordStrength.color }}>
@@ -308,6 +393,7 @@ export default function SignupPage() {
               style={inputStyle}
               placeholder="Confirm your password"
               required
+              disabled={isLoading}
             />
             {formData.confirmPassword && (
               <div style={{ ...passwordMatchStyle, color: passwordMatch.color }}>
@@ -325,6 +411,7 @@ export default function SignupPage() {
               onChange={handleInputChange}
               style={checkboxStyle}
               required
+              disabled={isLoading}
             />
             <label style={checkboxLabelStyle} htmlFor="acceptTerms">
               I agree to the{" "}
@@ -358,15 +445,18 @@ export default function SignupPage() {
           
           <button
             type="submit"
+            disabled={isLoading}
             style={
-              hovered === "signup"
+              isLoading
+                ? { ...signupButtonStyle, ...signupButtonDisabledStyle }
+                : hovered === "signup"
                 ? { ...signupButtonStyle, ...signupButtonHoverStyle }
                 : signupButtonStyle
             }
-            onMouseEnter={() => setHovered("signup")}
+            onMouseEnter={() => !isLoading && setHovered("signup")}
             onMouseLeave={() => setHovered(null)}
           >
-            Create Account
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
         
@@ -386,6 +476,7 @@ export default function SignupPage() {
             onMouseEnter={() => setHovered("google")}
             onMouseLeave={() => setHovered(null)}
             type="button"
+            disabled={isLoading}
           >
             <span role="img" aria-label="google">🔍</span>
             Google
@@ -399,6 +490,7 @@ export default function SignupPage() {
             onMouseEnter={() => setHovered("facebook")}
             onMouseLeave={() => setHovered(null)}
             type="button"
+            disabled={isLoading}
           >
             <span role="img" aria-label="facebook">📘</span>
             Facebook

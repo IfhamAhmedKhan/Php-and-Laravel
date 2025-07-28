@@ -17,7 +17,7 @@ function validateName(name: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, address, payment, phone, email, card } = body;
+    const { name, address, payment, phone, email, card, userId, productName, productPrice, productDetails } = body;
 
     if (!validateName(name)) {
       return NextResponse.json({ error: 'Name must be 1-15 characters.' }, { status: 400 });
@@ -35,17 +35,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment option.' }, { status: 400 });
     }
 
-    // Save to MongoDB
+    // Save to MongoDB with enhanced order information
     const client = await clientPromise;
     const db = client.db(dbName);
-    const order = { name, address, payment, phone, email, date: new Date().toISOString() };
+    
+    const order = {
+      name,
+      address,
+      payment,
+      phone,
+      email,
+      userId: userId || null, // Include user ID if available
+      productName: productName || 'Product',
+      productPrice: productPrice || 'Contact for pricing',
+      productDetails: productDetails || '',
+      status: 'pending', // Default status
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
     if (payment === 'online' && card) {
       order['card'] = card;
     }
-    await db.collection('orders').insertOne(order);
+    
+    const result = await db.collection('orders').insertOne(order);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true, 
+      orderId: result.insertedId,
+      message: 'Order placed successfully!' 
+    });
   } catch (e) {
+    console.error('Order submission error:', e);
     return NextResponse.json({ error: 'Server error.' }, { status: 500 });
   }
 } 

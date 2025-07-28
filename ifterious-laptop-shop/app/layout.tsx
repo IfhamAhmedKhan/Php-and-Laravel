@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 import React from "react";
+import { UserProvider } from "../contexts/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,13 +56,15 @@ export default function RootLayout({
         </div>
 
         {/* Foreground Content */}
-        <div className="relative z-10 flex flex-col min-h-screen">
-          <NavBar />
-          <main className="flex-grow responsive-padding">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <UserProvider>
+          <div className="relative z-10 flex flex-col min-h-screen">
+            <NavBar />
+            <main className="flex-grow responsive-padding">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </UserProvider>
       </body>
     </html>
   );

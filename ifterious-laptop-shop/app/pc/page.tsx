@@ -2,6 +2,8 @@
 import styles from "./pc.module.css";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUser } from "../../contexts/UserContext";
+import Link from "next/link";
 
 const pcItems = [
   {
@@ -41,25 +43,95 @@ const pcItems = [
   },
 ];
 
+const loginPromptStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: "rgba(0,0,0,0.8)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+};
+
+const loginPromptCardStyle: React.CSSProperties = {
+  background: "white",
+  padding: "2rem",
+  borderRadius: "12px",
+  textAlign: "center",
+  maxWidth: "400px",
+  margin: "1rem",
+};
+
+const loginPromptTitleStyle: React.CSSProperties = {
+  fontSize: "1.5rem",
+  fontWeight: "700",
+  color: "#333",
+  marginBottom: "1rem",
+};
+
+const loginPromptTextStyle: React.CSSProperties = {
+  fontSize: "1rem",
+  color: "#666",
+  marginBottom: "2rem",
+  lineHeight: "1.5",
+};
+
+const loginPromptButtonsStyle: React.CSSProperties = {
+  display: "flex",
+  gap: "1rem",
+  justifyContent: "center",
+};
+
+const loginPromptButtonStyle: React.CSSProperties = {
+  padding: "0.75rem 1.5rem",
+  borderRadius: "8px",
+  border: "none",
+  fontWeight: "600",
+  fontSize: "1rem",
+  cursor: "pointer",
+  transition: "all 0.2s",
+};
+
+const primaryButtonStyle: React.CSSProperties = {
+  ...loginPromptButtonStyle,
+  background: "#4f8cff",
+  color: "#fff",
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  ...loginPromptButtonStyle,
+  background: "#e5e7eb",
+  color: "#374151",
+};
+
 export default function PC() {
   const router = useRouter();
+  const { user } = useUser();
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [form, setForm] = useState({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
   const [error, setError] = useState<string | null>(null);
   const [showCardForm, setShowCardForm] = useState(false);
   const [card, setCard] = useState({ cardName: '', cardNumber: '', expiry: '', cvv: '' });
   const [cardError, setCardError] = useState<string | null>(null);
   const countryCodes = ['+1', '+44', '+91', '+92', '+61', '+81', '+49', '+33'];
+  
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone: string) => /^\d{10,15}$/.test(phone);
   const validateName = (name: string) => name.length > 0 && name.length <= 15;
+  
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  
   const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCard({ ...card, [e.target.name]: e.target.value });
   };
+  
   const validateCard = () => {
     if (!card.cardName || card.cardName.length > 26) return 'Cardholder name required (max 26 chars)';
     if (!/^\d{16}$/.test(card.cardNumber)) return 'Card number must be 16 digits';
@@ -67,6 +139,15 @@ export default function PC() {
     if (!/^\d{3,4}$/.test(card.cvv)) return 'CVV must be 3 or 4 digits';
     return null;
   };
+  
+  const handleBuyNow = () => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    setShowForm(true);
+  };
+  
   const handleProceed = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -80,6 +161,7 @@ export default function PC() {
     }
     await submitOrder();
   };
+  
   const submitOrder = async () => {
     try {
       const res = await fetch('/api/submit-form', {
@@ -91,6 +173,10 @@ export default function PC() {
           payment: form.payment,
           phone: form.country + form.phone,
           email: form.email,
+          userId: user?._id, // Add user ID to the order
+          productName: selectedIdx !== null ? pcItems[selectedIdx].name : 'PC Product',
+          productPrice: selectedIdx !== null ? pcItems[selectedIdx].price : 'Contact for pricing',
+          productDetails: selectedIdx !== null ? pcItems[selectedIdx].details : '',
           ...(form.payment === 'online' ? { card } : {})
         })
       });
@@ -104,11 +190,12 @@ export default function PC() {
       setSelectedIdx(null);
       setForm({ name: '', address: '', payment: 'online', phone: '', country: '+1', email: '' });
       setCard({ cardName: '', cardNumber: '', expiry: '', cvv: '' });
-      alert('Order placed!');
+      alert('Order placed successfully! You can view your orders in the Orders page.');
     } catch (e) {
       setError('Server error.');
     }
   };
+  
   const handleCardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCardError(null);
@@ -116,6 +203,7 @@ export default function PC() {
     if (err) { setCardError(err); return; }
     await submitOrder();
   };
+  
   return (
     <div className={styles.container}>
       <button onClick={() => router.push('/')} style={{ margin: "1rem 0", padding: "0.5rem 1.2rem", borderRadius: 8, border: "none", background: "#4f8cff", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: "1rem" }}>Go Back</button>
@@ -140,7 +228,7 @@ export default function PC() {
             <p style={{margin: '1rem 0'}}>{pcItems[selectedIdx].details}</p>
             {!showForm ? (
               <>
-                <button style={{padding: '0.7rem 2rem', background: '#4f8cff', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}} onClick={() => setShowForm(true)}>Buy Now</button>
+                <button style={{padding: '0.7rem 2rem', background: '#4f8cff', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer'}} onClick={handleBuyNow}>Buy Now</button>
                 <button onClick={() => setSelectedIdx(null)} style={{marginLeft: 16, padding: '0.7rem 2rem', background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 500, fontSize: '1.1rem', cursor: 'pointer'}}>Close</button>
               </>
             ) : (
@@ -180,6 +268,36 @@ export default function PC() {
                 )}
               </>
             )}
+          </div>
+        </div>
+      )}
+      
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <div style={loginPromptStyle} onClick={() => setShowLoginPrompt(false)}>
+          <div style={loginPromptCardStyle} onClick={e => e.stopPropagation()}>
+            <h2 style={loginPromptTitleStyle}>Login Required</h2>
+            <p style={loginPromptTextStyle}>
+              Please log in or create an account to place orders. This helps us provide better service and track your orders.
+            </p>
+            <div style={loginPromptButtonsStyle}>
+              <Link href="/login">
+                <button style={primaryButtonStyle}>
+                  Login
+                </button>
+              </Link>
+              <Link href="/signup">
+                <button style={primaryButtonStyle}>
+                  Sign Up
+                </button>
+              </Link>
+              <button 
+                onClick={() => setShowLoginPrompt(false)}
+                style={secondaryButtonStyle}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
