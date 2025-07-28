@@ -51,14 +51,57 @@ const linkHoverStyle = {
   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
 };
 
+const authButtonsContainer: React.CSSProperties = {
+  position: "absolute",
+  right: "2rem",
+  display: "flex",
+  gap: "1rem",
+  alignItems: "center",
+};
+
+const authButtonStyle = {
+  color: "#fff",
+  fontWeight: 600,
+  fontSize: "1rem",
+  textDecoration: "none",
+  padding: "8px 16px",
+  borderRadius: "6px",
+  transition: "all 0.2s",
+  border: "2px solid rgba(255,255,255,0.3)",
+  background: "rgba(255,255,255,0.1)",
+};
+
+const authButtonHoverStyle = {
+  background: "rgba(255,255,255,0.2)",
+  border: "2px solid rgba(255,255,255,0.5)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
+const signUpButtonStyle = {
+  ...authButtonStyle,
+  background: "rgba(255,255,255,0.2)",
+  border: "2px solid rgba(255,255,255,0.4)",
+};
+
+const signUpButtonHoverStyle = {
+  background: "rgba(255,255,255,0.3)",
+  border: "2px solid rgba(255,255,255,0.6)",
+  transform: "translateY(-1px)",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
 const NavBar = () => {
   const [hovered, setHovered] = useState(-1);
+  const [authHovered, setAuthHovered] = useState<string | null>(null);
+  
   const links = [
     { href: "/home", label: "Home" },
     { href: "/about", label: "About Us" },
     { href: "/pc", label: "PC" },
     { href: "/laptop", label: "Laptop" },
   ];
+  
   return (
     <nav style={navStyle}>
       <Link href="/home" style={logoStyle}>
@@ -83,6 +126,32 @@ const NavBar = () => {
           </li>
         ))}
       </ul>
+      <div style={authButtonsContainer}>
+        <Link
+          href="/login"
+          style={
+            authHovered === "login"
+              ? { ...authButtonStyle, ...authButtonHoverStyle }
+              : authButtonStyle
+          }
+          onMouseEnter={() => setAuthHovered("login")}
+          onMouseLeave={() => setAuthHovered(null)}
+        >
+          Login
+        </Link>
+        <Link
+          href="/signup"
+          style={
+            authHovered === "signup"
+              ? { ...signUpButtonStyle, ...signUpButtonHoverStyle }
+              : signUpButtonStyle
+          }
+          onMouseEnter={() => setAuthHovered("signup")}
+          onMouseLeave={() => setAuthHovered(null)}
+        >
+          Sign Up
+        </Link>
+      </div>
     </nav>
   );
 };
