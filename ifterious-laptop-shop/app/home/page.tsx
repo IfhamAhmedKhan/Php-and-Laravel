@@ -1,8 +1,9 @@
 "use client";
 
 import styles from "./home.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "../../contexts/UserContext";
 
 const pcItems = [
   {
@@ -55,6 +56,8 @@ const laptopItems = [
 const allItems = [...pcItems, ...laptopItems];
 
 export default function Home() {
+  const router = useRouter();
+  const { login } = useUser();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<typeof allItems | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -130,7 +133,31 @@ export default function Home() {
     if (err) { setCardError(err); return; }
     await submitOrder();
   };
-  const router = useRouter();
+
+  // Handle Google OAuth redirect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authStatus = urlParams.get('auth');
+    const userData = urlParams.get('user');
+
+    if (authStatus === 'success' && userData) {
+      try {
+        const user = JSON.parse(userData);
+        login(user);
+        
+        // Clear URL parameters
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('auth');
+        newUrl.searchParams.delete('user');
+        window.history.replaceState({}, '', newUrl.toString());
+        
+        // Show success message
+        alert('Successfully logged in with Google!');
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, [login]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
