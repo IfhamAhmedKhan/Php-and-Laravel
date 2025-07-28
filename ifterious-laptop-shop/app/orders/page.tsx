@@ -322,7 +322,7 @@ export default function OrdersPage() {
             <p style={noOrdersTextStyle}>
               You haven't placed any orders yet. Start shopping to see your orders here!
             </p>
-            <Link href="/laptop">
+            <Link href="/pc">
               <button
                 style={
                   hovered === "shop"

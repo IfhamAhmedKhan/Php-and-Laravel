@@ -140,7 +140,7 @@ const NavBar = () => {
   const baseLinks = [
     { href: "/home", label: "Home" },
     { href: "/about", label: "About Us" },
-    { href: "/pc", label: "PC" },
+    { href: "/pc", label: "Gaming Laptops" },
     { href: "/laptop", label: "Laptop" },
   ];
 

@@ -7,39 +7,39 @@ import Link from "next/link";
 
 const pcItems = [
   {
-    name: "Gaming PC X1",
+    name: "Gaming Laptop X1",
     price: "$1200",
     image: "https://m.media-amazon.com/images/I/71sIsHeIpIL._AC_SL1500_.jpg",
     details: "Intel i7, 16GB RAM, RTX 3060, 1TB SSD",
-    category: "PC",
+    category: "Gaming Laptop",
   },
   {
-    name: "Workstation Pro",
+    name: "Gaming Laptop Pro",
     price: "$1800",
     image: "https://rb.gy/nd5kn5",
     details: "AMD Ryzen 9, 32GB RAM, RTX 3070, 2TB SSD",
-    category: "PC",
+    category: "Gaming Laptop",
   },
   {
-    name: "Creator Studio",
+    name: "Gaming Laptop Studio",
     price: "$1500",
     image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
     details: "Intel i9, 32GB RAM, RTX 3080, 2TB SSD",
-    category: "PC",
+    category: "Gaming Laptop",
   },
   {
-    name: "Budget Build",
+    name: "Gaming Laptop Lite",
     price: "$700",
     image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
     details: "Intel i5, 8GB RAM, GTX 1650, 512GB SSD",
-    category: "PC",
+    category: "Gaming Laptop",
   },
   {
-    name: "Silent Office",
+    name: "Gaming Laptop Silent",
     price: "$950",
     image: "https://images.unsplash.com/photo-1515168833906-d2a3b82b3029?auto=format&fit=crop&w=400&q=80",
     details: "Intel i5, 16GB RAM, Integrated Graphics, 1TB SSD",
-    category: "PC",
+    category: "Gaming Laptop",
   },
 ];
 
@@ -174,7 +174,7 @@ export default function PC() {
           phone: form.country + form.phone,
           email: form.email,
           userId: user?._id, // Add user ID to the order
-          productName: selectedIdx !== null ? pcItems[selectedIdx].name : 'PC Product',
+          productName: selectedIdx !== null ? pcItems[selectedIdx].name : 'Gaming Laptop',
           productPrice: selectedIdx !== null ? pcItems[selectedIdx].price : 'Contact for pricing',
           productDetails: selectedIdx !== null ? pcItems[selectedIdx].details : '',
           ...(form.payment === 'online' ? { card } : {})
@@ -207,8 +207,8 @@ export default function PC() {
   return (
     <div className={styles.container}>
       <button onClick={() => router.push('/')} style={{ margin: "1rem 0", padding: "0.5rem 1.2rem", borderRadius: 8, border: "none", background: "#4f8cff", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: "1rem" }}>Go Back</button>
-      <h1>PC Page</h1>
-      <h2 className={styles.welcome}>Welcome to the gaming laptop page!</h2>
+      <h1>Gaming Laptops</h1>
+      <h2 className={styles.welcome}>Welcome to the Gaming Laptops page!</h2>
       <div className={styles.cardGrid}>
         {pcItems.map((item, idx) => (
           <div className={styles.card} key={idx} onClick={() => setSelectedIdx(idx)}>
@@ -278,7 +278,7 @@ export default function PC() {
           <div style={loginPromptCardStyle} onClick={e => e.stopPropagation()}>
             <h2 style={loginPromptTitleStyle}>Login Required</h2>
             <p style={loginPromptTextStyle}>
-              Please log in or create an account to place orders. This helps us provide better service and track your orders.
+              Please log in or create an account to place orders for gaming laptops. This helps us provide better service and track your orders.
             </p>
             <div style={loginPromptButtonsStyle}>
               <Link href="/login">

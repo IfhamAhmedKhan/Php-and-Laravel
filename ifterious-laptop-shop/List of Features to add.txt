@@ -1,0 +1,31 @@
+Admin Dashboard:
+
+-> Add product management (CRUD for laptops).
+
+-> Update order statuses manually (like “Shipped”, “Delivered”).
+
+-> View all user data and sales stats.
+
+Search & Filters:
+
+-> Add product search with fuzzy matching.
+
+-> Filter by price range, specs, availability.
+
+Wishlist / Favorites:
+
+-> Let users save products to view later.
+
+Email Notifications:
+
+-> Confirmation emails after order placement.
+
+-> Password reset via token link.
+
+SEO Optimization:
+
+-> Use <meta> tags, OG tags, and schema.org for better visibility.
+
+Accessibility:
+
+-> Ensure color contrast, focus indicators, and screen reader support.
