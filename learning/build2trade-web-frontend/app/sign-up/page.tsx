@@ -1,12 +1,47 @@
+'use client';
+
 import Image from "next/image";
+import { useState } from "react";
+import signUp from "../services/sign-up";
 
 export default function SignUp() {
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+   
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    const payload = {
+      fullName,
+      phoneNumber,
+      email,
+      password,
+      role: 'Builder',
+    };
+
+    try {
+      const response = await signUp(payload);
+      console.log("Signup success:", response);
+      alert("Account created successfully!");
+      
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Branding and Visuals */}
+      {/* Left Panel */}
       <div className="w-1/2 bg-black relative overflow-hidden">
-        
-        {/* Workers image extending behind right panel */}
         <div className="absolute bottom-0 left-0 w-full h-3/4 overflow-hidden">
           <div className="relative h-full w-full">
             <Image
@@ -20,8 +55,7 @@ export default function SignUp() {
             />
           </div>
         </div>
-        
-        {/* Logo */}
+
         <div className="absolute top-8 left-8 z-10">
           <Image
             src="/logo.png"
@@ -34,9 +68,8 @@ export default function SignUp() {
         </div>
       </div>
 
-      {/* Right Panel - Sign Up Form */}
+      {/* Right Panel */}
       <div className="w-1/2 relative flex items-center justify-center p-12 bg-black">
-        {/* Background Image */}
         <div className="absolute inset-0 -left-11">
           <Image
             src="/rightside-background.png"
@@ -46,20 +79,20 @@ export default function SignUp() {
             priority
           />
         </div>
-        
-        {/* Content */}
+
         <div className="relative z-10 w-full max-w-xs">
           <h1 className="text-xl font-bold text-white text-center mb-6">
             Sign Up
           </h1>
 
-          <form className="space-y-3">
+          <form className="space-y-3" onSubmit={handleSubmit}>
             <div className="flex justify-center">
               <input
                 type="text"
                 placeholder="Full Name"
-                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                style={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-sm"
               />
             </div>
 
@@ -67,8 +100,9 @@ export default function SignUp() {
               <input
                 type="email"
                 placeholder="Email"
-                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                style={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-sm"
               />
             </div>
 
@@ -76,8 +110,9 @@ export default function SignUp() {
               <input
                 type="tel"
                 placeholder="Mobile Number"
-                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                style={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-sm"
               />
             </div>
 
@@ -85,8 +120,9 @@ export default function SignUp() {
               <input
                 type="password"
                 placeholder="Password"
-                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                style={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-sm"
               />
             </div>
 
@@ -94,15 +130,16 @@ export default function SignUp() {
               <input
                 type="password"
                 placeholder="Confirm Password"
-                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                style={{ color: 'rgba(0, 0, 0, 0.5)' }}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-3/4 px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-sm"
               />
             </div>
 
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="w-3/4 bg-gradient-to-r from-orange-400 to-yellow-500 text-white py-1.5 rounded-lg font-bold hover:from-orange-500 hover:to-yellow-600 transition-all duration-200 text-sm"
+                className="w-3/4 bg-gradient-to-r from-orange-400 to-yellow-500 text-white py-1.5 rounded-lg font-bold text-sm"
               >
                 Sign up
               </button>
@@ -112,7 +149,7 @@ export default function SignUp() {
           <div className="text-center mt-3">
             <span className="text-white text-xs">
               Already have an Account?{" "}
-              <a href="/sign-in" className="bg-gradient-to-b from-[#FDC123] to-[#D9870A] bg-clip-text text-transparent font-medium hover:opacity-80 transition-opacity">
+              <a href="/sign-in" className="bg-gradient-to-b from-[#FDC123] to-[#D9870A] bg-clip-text text-transparent font-medium hover:opacity-80">
                 Sign in
               </a>
             </span>
@@ -126,7 +163,7 @@ export default function SignUp() {
             </div>
 
             <div className="mt-3 flex justify-center space-x-2">
-              <button className="w-8 h-8 bg-transparent flex items-center justify-center hover:opacity-80 transition-opacity">
+              <button className="w-8 h-8 bg-transparent flex items-center justify-center hover:opacity-80">
                 <Image
                   src="/google.png"
                   alt="Google"
@@ -135,7 +172,7 @@ export default function SignUp() {
                   className="w-4 h-4"
                 />
               </button>
-              <button className="w-8 h-8 bg-transparent flex items-center justify-center hover:opacity-80 transition-opacity">
+              <button className="w-8 h-8 bg-transparent flex items-center justify-center hover:opacity-80">
                 <Image
                   src="/apple.png"
                   alt="Apple"
@@ -150,4 +187,4 @@ export default function SignUp() {
       </div>
     </div>
   );
-} 
+}
