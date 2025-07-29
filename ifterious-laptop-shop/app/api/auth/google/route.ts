@@ -39,15 +39,37 @@ export async function GET(request: NextRequest) {
     });
     const userInfo = await userRes.json();
 
-    // Create the payload you requested
+    // Create the payload for your external backend
     const payload = {
+      fullName: userInfo.name || userInfo.email.split('@')[0],
       email: userInfo.email,
       idToken: tokenData.id_token,
-      provider: "google"
+      provider: "google",
+      role: "Tradie" // You can modify this as needed
     };
 
-    
     console.log('Google idToken:', tokenData.id_token);
+    console.log('Payload to send to external backend:', payload);
+
+    // Send payload to your external backend
+    try {
+      const backendResponse = await fetch('http://localhost:9001/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (backendResponse.ok) {
+        const backendData = await backendResponse.json();
+        console.log('External backend response:', backendData);
+      } else {
+        console.error('External backend error:', await backendResponse.text());
+      }
+    } catch (backendError) {
+      console.error('Failed to send payload to external backend:', backendError);
+    }
 
     console.log('Google OAuth successful:', {
       email: userInfo.email,
