@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javascript</title>
+    <script>
+        function myFunction(){
+            document.getElementById("demo").innerHTML = "Paragraph changed.";
+            window.alert("You clicked");
+            console.log(3+4+"5");
+        }
+        function printPage(){
+            window.print();
+        }
+    </script>
+</head>
+<body>
+    <p id="demo">Hello</p>
+    <button type="button" onclick="myFunction()">Click me!</button>
+    <button type="button" onclick="printPage()">print</button>
+</body>
+</html>
