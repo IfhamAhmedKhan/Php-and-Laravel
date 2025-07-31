@@ -299,15 +299,104 @@ console.log(a.values())
 // console.log(UserAge)
 // console.log(message())
 
-let text = '{ "employees" : [' +
-'{ "firstName":"John" , "lastName":"Doe" },' +
-'{ "firstName":"Anna" , "lastName":"Smith" },' +
-'{ "firstName":"Peter" , "lastName":"Jones" } ]}';
+// let text = '{ "employees" : [' +
+// '{ "firstName":"John" , "lastName":"Doe" },' +
+// '{ "firstName":"Anna" , "lastName":"Smith" },' +
+// '{ "firstName":"Peter" , "lastName":"Jones" } ]}';
 
 
-const obj = JSON.parse(text);
+// const obj = JSON.parse(text);
 
-console.log(obj.employees[1].firstName + " " + obj.employees[1].lastName);
+// console.log(obj.employees[1].firstName + " " + obj.employees[1].lastName);
+
+// // Closures
+
+// function myCounter(){
+//   let counter = 0;
+//   return function (){
+//     counter++;
+//     return counter;
+//   }
+
+// }
+
+// const add = myCounter();
+// add()
+// add()
+
+// console.log(add())
+
+// // Callback
+
+// function result(some){
+//   console.log(some)
+// }
+
+// function calculator(a,b,callBack){
+//   let c = a + b;
+//   callBack(c);
+// }
+
+// calculator(5,5,result)
+
+// // asynchronous
+
+// setTimeout(myFunction, 3000)
+
+// function myFunction(){
+//   console.log("Hello!");
+// }
+
+// Promises (resolve, reject)
+
+// fetch('https://jsonplaceholder.typicode.com/users/1') // Step 1: Fetch user
+//   .then(response => response.json())                  // Step 2: Convert to JSON
+//   .then(data => {                                     // Step 3: Handle the data
+//     console.log("User Name:", data.name);
+//     console.log("Email:", data.email);
+//   })
+//   .catch(error => {                                   // Step 4: Handle errors
+//     console.log("Something went wrong ", error);
+//   });
+
+// Async and await
+
+// async function getUser() {
+//   try {
+//     console.log("Fetching user...");
+    
+//     const response = await fetch('https://jsonplaceholder.typicode.com/users/1');
+//     const data = await response.json();  // wait until it turns the response into usable data
+    
+//     console.log("User fetched:");
+//     console.log(data);  // print user data
+//   } catch (error) {
+//     console.log("Something went wrong:", error);
+//   }
+// }
+
+// getUser();
 
 
 
+// // Arrow function
+
+// myWork = () => {
+//   console.log("Frontend")
+//   let age = 24
+//   return age
+// }
+
+// myWork()
+// console.log(myWork())
+
+
+const person = {
+  username: "IfhamAhmedKhan",
+  firstName: "Ifham",
+  lastName: "Khan"
+}
+
+const val = JSON.stringify(person)
+
+console.log(val)

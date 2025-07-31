@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning API</title>
+</head>
+<body>
+    <p id="id1" onmouseover="getName()">Welcome</p>
+    <p id="id2">Text</p>
+    <br><br>
+    <label>Enter your name: </label>
+    <input type="text" id="InputData1" placeholder="Enter the name">
+    <button onclick="changeName()">submit</button>
+
+    <br><br>
+    <button onclick="goBackward()">Go back</button>
+    <button onclick="goForward()">Next page</button>
+
+    <script>
+        function goBackward(){
+            window.history.back();
+        }
+        function goForward(){
+            window.history.forward();
+        }
+
+        function getName(){
+            localStorage.setItem("name", "Ifham");
+            let username = localStorage.getItem("name");
+            document.getElementById("id1").innerHTML = username
+        }
+        Math.r
+
+        let newValue = document.getElementById("InputData1")
+        let username = newValue.value
+
+        function changeName(){
+            document.getElementById("id2").innerHTML = username
+        }
+
+    </script>
+</body>
+</html>

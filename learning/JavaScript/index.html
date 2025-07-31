@@ -2,13 +2,40 @@
 <html>
 <body>
 
-<h1>My First Web Page</h1>
+<h1 id="demo">My First Web Page</h1>
+<p id="1"></p>
+<h1 onclick="this.innerHTML='Ooops!'">click me</h1>
+<p onmouseover="mMove(this)">hover me </p>
+
+<button id="timeTeller">try it!</button>
+<p id="newDemo"></p>
+
+<button onclick="myFunc()">click me!</button>
 
 <script>
 a = 5;
 b = 6;
 c = a + b;
 console.log(c);
+const value = document.baseURI;
+const val1 = document.cookie;
+document.getElementById("demo").innerHTML = value
+document.getElementById("1").innerHTML = val1
+
+function mMove(obj){
+    obj.innerHTML = "Thank you";
+}
+
+document.getElementById("timeTeller").addEventListener("click",displayDate);
+function displayDate(){
+    document.getElementById("newDemo").innerHTML =  Date();
+}
+
+function myFunc(){
+    alert("This is the new function")
+    window.prompt("do this work")
+}
+
 </script>
 
 </body>

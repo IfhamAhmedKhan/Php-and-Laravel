@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main page</title>
+</head>
+<body>
+    <p id="id1">Welcome</p>
+    <label></label>
+    <input type="text" placeholder="Enter your name" id="myName">
+    <br><br>
+    <label></label>
+    <input type="password" placeholder="Enter your password" id="myPass">
+
+    <br><br>
+    <button onclick="storeName()">Submit</button>
+
+    <br><br>
+    <button onclick="tabopener()">Open new tab</button>
+
+    <script>
+
+        function storeName(){
+            let UserEnterName = document.getElementById("myName")
+            let UserEnterPass = document.getElementById("myPass")
+            let username = UserEnterName.value
+            let userpass = UserEnterPass.value
+            alert(`Welcome ${username} your password is ${userpass}`)
+
+        }
+
+        function tabopener(){
+            alert(navigator.appName)
+        }
+    </script>
+</body>
+</html>
