@@ -391,12 +391,26 @@ console.log(a.values())
 // console.log(myWork())
 
 
-const person = {
-  username: "IfhamAhmedKhan",
-  firstName: "Ifham",
-  lastName: "Khan"
-}
+// const person = {
+//   username: "IfhamAhmedKhan",
+//   firstName: "Ifham",
+//   lastName: "Khan"
+// }
 
-const val = JSON.stringify(person)
+// const val = JSON.stringify(person)
 
-console.log(val)
+// console.log(val)
+
+// const array1 = [1, 2, 3];
+// const array2 = [4, 5, 6];
+// const combined = [...array1 , ...array2]
+// console.log(combined)
+
+// function car({make, model}) {
+//   return <h1>{make} {model}</h1>;
+// };
+
+const make = 'Ford';
+const model = 'Mustang';
+const car = { make, model };
+console.log(car);
