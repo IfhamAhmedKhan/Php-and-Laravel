@@ -1,23 +1,29 @@
-const signUp = async (signUpPayload: {
+import { error } from "console";
+
+export const signUp = async (payload: {
   fullName: string;
   phoneNumber: string;
   email: string;
   password: string;
   role: string;
-}): Promise<any> => {
-  const Url = process.env.NEXT_PUBLIC_API_BASE_URL + '/auth/signup';
+}) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  console.log("baseUrl",baseUrl)
 
-  const response = await fetch(Url, {
+  const response = await fetch(`${baseUrl}/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(signUpPayload),
+    body: JSON.stringify(payload),
   });
+console.log("response",response)
+  if (!response.ok) {
+  const errorBody = await response.json();
+  console.log("Signup API error:", errorBody); // Add this line
+  throw new Error(errorBody.message || "Signup failed");
+}
+console.log("error")
 
-  const data = await response.json();
-  return data;
+  return await response.json();
 };
-
-export default signUp;
-

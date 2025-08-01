@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import signUp from "../services/sign-up";
+import { signUp } from "../services/sign-up";
+
 
 export default function SignUp() {
   const [fullName, setFullName] = useState('');
@@ -13,6 +14,7 @@ export default function SignUp() {
    
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    alert(`${fullName},${phoneNumber},${email},${password},${confirmPassword},`)
 
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
@@ -24,7 +26,7 @@ export default function SignUp() {
       phoneNumber,
       email,
       password,
-      role: 'Builder',
+      role: 'Tradie',
     };
 
     try {
