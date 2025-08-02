@@ -1,0 +1,43 @@
+1) make AUTHAPI folder and open vs code inside 
+
+2) run -> npm init -y to install package.json
+
+3) run -> npm i express to download express app
+
+4) make a file name index.js and make changes to package.json -> add "type": "module",
+
+5) make express server by editing index.js -> 
+import express from "express"
+
+const app = express....
+
+6) run npm i -g nodemon to install npm package that way you won't have to worry about restarting server each time you make changes in it  
+
+7) make folders inside AUTHAPI -> model, controller, routes
+
+8) run -> npm i mongoose then make a folder inside model -> userModel.js then do the code for database field
+
+9) make a new folder -> db and inside db make -> db.js then do code for database connection
+
+10) Make a new project in mongodb atlas and create a new cluster then go to Database Access and make new user and assign admin role to it user: ifham password: Ouek9SXJS5gB3FWf
+
+11)  then make a new terminal and install -> npm i dotenv (handle all the important Urls)
+
+12) inside routes folder make .env and assign url to variables later import dotenv to index.js
+
+13) then connect your cluster and edit .env file pass the string in it and edit db.js and pass variable from .env to it 
+
+14) then edit index.js and import db in it. 
+
+15) then make userRoutes.js inside user route and same for controller (add code to them)
+
+16) install npm i bcryptjs (do the code to add bcrypt) import bcrypt from "bcryptjs";
+
+17) npm i jsonwebtoken then you code add code for making token 
+
+18) npm i cookie-parser, once done then add middlewear in index.js
+
+
+ mongodb+srv://ifham:Ouek9SXJS5gB3FWf@authdata.uuxo9gj.mongodb.net/?retryWrites=true&w=majority&appName=Authdata
+
+
