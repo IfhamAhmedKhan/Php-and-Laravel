@@ -37,6 +37,7 @@ const app = express....
 
 18) npm i cookie-parser, once done then add middlewear in index.js
 
+npm install cors
 
  mongodb+srv://ifham:Ouek9SXJS5gB3FWf@authdata.uuxo9gj.mongodb.net/?retryWrites=true&w=majority&appName=Authdata
 
