@@ -12,6 +12,7 @@ export const signUp = async (payload: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
+        credentials: 'include' // Important for cookies
     });
     console.log("response", response)
     if (!response.ok) {

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
 
-    // Making attributes the fields we want in our login page
+    // making attributes the fields we want in our login page
     name:{
         type: String,
         unique: true
