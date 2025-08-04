@@ -8,10 +8,7 @@ export const Login = async (req, res) => {
 
         // checking if user is missing any field
         if (!email || !password) {
-            return res.send({
-                message: "please fill the required field",
-                success: false,
-            });
+            return res.send({ message: "please fill the required field", success: false,});
         }
 
         const checkexistuser = await userModel.findOne({ email });
@@ -28,7 +25,7 @@ export const Login = async (req, res) => {
             return res.status(401).json({ message: "Invalid password", success: false });
         }
 
-        const token = await jwt.sign({ id: checkexistuser._id }, process.env.TOKEN_SECRET)
+        const token = await jwt.sign({ _id: checkexistuser._id }, process.env.TOKEN_SECRET)
 
         if (!token) {
             return res.send({ message: "token is not created", success: false })
@@ -54,10 +51,7 @@ export const Signup = async (req, res) => {
 
         // checking if user is missing any field
         if (!email || !name || !password) {
-            return res.send({
-                message: "please fill the required field",
-                success: false,
-            });
+            return res.send({ message: "please fill the required field", success: false});
         }
 
         // checking if the user already exist
@@ -100,40 +94,13 @@ export const Signup = async (req, res) => {
     }
 }
 
+// Simplified profile function - middleware handles token verification
 export const getProfile = async (req, res) => {
     try {
-        const { token } = req.cookies;
+        // User is already verified by middleware and available in req.user
+        const user = req.user;
         
-        if (!token) {
-            return res.status(401).json({ 
-                message: "No token provided", 
-                success: false 
-            });
-        }
-
-        // verify the token
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        
-        if (!decoded) {
-            return res.status(401).json({ 
-                message: "Invalid token", 
-                success: false 
-            });
-        }
-
-        // find user by ID (from token)
-        const user = await userModel.findById(decoded.id || decoded._id).select('-password');
-        
-        if (!user) {
-            return res.status(404).json({ 
-                message: "User not found", 
-                success: false 
-            });
-        }
-
-        return res.json({
-            message: "Profile fetched successfully",
-            success: true,
+        return res.json({ message: "Profile fetched successfully", success: true,
             user: {
                 name: user.name,
                 email: user.email
@@ -142,12 +109,6 @@ export const getProfile = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ 
-                message: "Invalid token", 
-                success: false 
-            });
-        }
         return res.status(500).json({ 
             message: error.message, 
             success: false 

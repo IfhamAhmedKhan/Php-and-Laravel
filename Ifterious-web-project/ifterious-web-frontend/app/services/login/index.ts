@@ -11,7 +11,7 @@ export const login = async (payload: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-        credentials: 'include' // Important for cookies
+        credentials: 'include' 
     });
     
     console.log("response", response)

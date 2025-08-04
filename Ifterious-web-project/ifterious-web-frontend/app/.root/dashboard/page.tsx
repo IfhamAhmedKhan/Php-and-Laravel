@@ -35,7 +35,7 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    // Clear cookies by setting them to expire
+    // clear cookies by setting them to expire
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     router.push('/');
   };
@@ -63,31 +63,14 @@ export default function Dashboard() {
         <div className="sidebar-header">
           <h2>Ifterious Web</h2>
         </div>
-        
         <nav className="sidebar-nav">
-          <button 
-            className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            Dashboard
-          </button>
-          
-          <button 
-            className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-          >
-            Profile
-          </button>
+          <button className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}> Dashboard </button>
+          <button className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}> Profile </button>
         </nav>
-
         <div className="sidebar-footer">
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <button className="logout-btn" onClick={handleLogout}> Logout </button>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="main-content">
         <div className="content-header">
           <h1>Welcome to Ifterious Web</h1>

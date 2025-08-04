@@ -7,7 +7,7 @@ export const getProfile = async () => {
         headers: {
             "Content-Type": "application/json",
         },
-        credentials: 'include' // Important for cookies
+        credentials: 'include' 
     });
     
     console.log("response", response)
