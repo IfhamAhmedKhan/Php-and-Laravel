@@ -13,6 +13,7 @@ export const signUp = async (payload: {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
     });
     console.log("response", response)
@@ -25,9 +26,9 @@ export const signUp = async (payload: {
 
     const data = await response.json();
     
-    // Store token in localStorage if signup is successful
+    // Store token in httpOnly cookie if signup is successful
     if (data.success && data.token) {
-        setToken(data.token);
+        await setToken(data.token);
     }
 
     return data;

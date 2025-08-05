@@ -12,6 +12,7 @@ export const login = async (payload: {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
     });
     
@@ -24,9 +25,9 @@ export const login = async (payload: {
         throw new Error(data.message || "Login failed");
     }
     
-    // store token in localStorage if login is successful
+    // store token in httpOnly cookie if login is successful
     if (data.success && data.token) {
-        setToken(data.token);
+        await setToken(data.token);
     }
     
     return data;

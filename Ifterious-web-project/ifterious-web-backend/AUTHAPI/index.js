@@ -2,6 +2,7 @@ import "dotenv/config.js";
 import express from "express";
 import { db } from "./db/db.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 // create server
 const app = express();
@@ -12,10 +13,12 @@ const PORT = process.env.PORT || 3000;
 
 // CORS configuration
 app.use(cors({
-    origin: "http://localhost:3000"
+    origin: "http://localhost:3000",
+    credentials: true
 }));
 
 app.use(express.json())
+app.use(cookieParser())
 
 // initial route
 app.use("/api/user", userRoute);

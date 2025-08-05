@@ -10,12 +10,14 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     const payload = {
@@ -28,8 +30,12 @@ export default function Signup() {
       const response = await signUp(payload);
       
       if (response.success) {
-        // Redirect to dashboard on successful signup
-        router.push('/.root/login');
+        // Show success message instead of redirecting
+        setSuccess('Account created successfully! You can now login.');
+        // Clear form
+        setName('');
+        setEmail('');
+        setPassword('');
       } else {
         setError(response.message || 'Signup failed');
       }
@@ -49,6 +55,11 @@ export default function Signup() {
             {error && (
               <div style={{color: 'red', backgroundColor: '#ffe6e6', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center' }}>
                 {error}
+              </div>
+            )}
+            {success && (
+              <div style={{color: 'green', backgroundColor: '#e6ffe6', padding: '10px', borderRadius: '4px', marginBottom: '15px', textAlign: 'center', border: '1px solid #4CAF50' }}>
+                {success}
               </div>
             )}
             <label>Username<br />

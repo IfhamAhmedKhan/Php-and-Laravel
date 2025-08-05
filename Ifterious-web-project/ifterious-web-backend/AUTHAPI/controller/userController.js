@@ -133,6 +133,11 @@ export const refreshAccessToken = async (req, res) => {
             return res.status(404).json({ message: "User not found", success: false });
         }
 
+        // Verify the stored refresh token hash
+        const isValidRefreshToken = await bcrypt.compare(token, user.token);
+        if (!isValidRefreshToken) {
+            return res.status(401).json({ message: "Invalid refresh token", success: false });
+        }
 
         const newAccessToken = jwt.sign(
             { _id: user._id },
