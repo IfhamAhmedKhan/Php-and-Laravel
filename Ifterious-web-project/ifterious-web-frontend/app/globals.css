@@ -83,11 +83,6 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(23, 23, 23, 0.1);
 }
 
-input::placeholder {
-  color: #999;
-  font-style: italic;
-}
-
 button {
   width: 100%;
   color: #ffffff;
@@ -133,7 +128,6 @@ a:hover {
   color: rgb(138, 0, 0);
 }
 
-/* Dashboard Styles */
 .dashboard-container {
   display: flex;
   min-height: 100vh;

@@ -1,3 +1,5 @@
+import { setToken } from '../auth';
+
 export const signUp = async (payload: {
     name: string,
     email: string,
@@ -12,7 +14,6 @@ export const signUp = async (payload: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-        credentials: 'include' 
     });
     console.log("response", response)
     if (!response.ok) {
@@ -22,5 +23,12 @@ export const signUp = async (payload: {
     }
     console.log("error")
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Store token in localStorage if signup is successful
+    if (data.success && data.token) {
+        setToken(data.token);
+    }
+
+    return data;
 };

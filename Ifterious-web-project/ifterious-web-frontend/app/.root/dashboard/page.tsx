@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getProfile } from '../../services/profile';
+import { removeToken } from '../../services/auth';
 
 interface User {
   name: string;
@@ -35,8 +36,8 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    // clear cookies by setting them to expire
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // clear token from localStorage
+    removeToken();
     router.push('/');
   };
 
@@ -80,15 +81,23 @@ export default function Dashboard() {
           {activeTab === 'dashboard' && (
             <div className="dashboard-content">
               <h2>Dashboard</h2>
-              <p>Welcome back! This is your main dashboard.</p>
+              <p>Welcome {user?.name} This is your main dashboard.</p>
               <div className="dashboard-stats">
                 <div className="stat-card">
                   <h3>Account Status</h3>
                   <p>Active</p>
                 </div>
                 <div className="stat-card">
-                  <h3>Member Since</h3>
-                  <p>Today</p>
+                  <h3>Project completed</h3>
+                  <p>0</p>
+                </div>
+                <div className="stat-card">
+                  <h3>Payment</h3>
+                  <p>$0</p>
+                </div>
+                <div className="stat-card">
+                  <h3>Income</h3>
+                  <p>$0</p>
                 </div>
               </div>
             </div>

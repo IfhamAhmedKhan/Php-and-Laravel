@@ -7,7 +7,7 @@ export default function Home() {
         <fieldset>
           <legend>Welcome</legend>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'black', marginBottom: '20px' }}>Ifterious Web</h2>
+            <h1 style={{ color: 'black', marginBottom: '20px' }}>Ifterious Web</h1>
             <Link href="/.root/login" style={{ textDecoration: 'none' }}>
               <button style={{ marginBottom: '15px' }}>Login</button>
             </Link>

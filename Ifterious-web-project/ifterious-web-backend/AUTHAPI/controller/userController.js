@@ -2,105 +2,109 @@ import userModel from "../model/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+
+export const Signup = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!email || !name || !password) {
+            return res.status(400).json({ message: "Please fill all the required fields", success: false });
+        }
+
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ message: "User already exists", success: false });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new userModel({
+            name,
+            email,
+            password: hashedPassword,
+            token: '' 
+        });
+
+        await newUser.save();
+
+        return res.status(201).json({
+            message: "User created successfully",
+            success: true
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message, success: false });
+    }
+};
+
+
 export const Login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // checking if user is missing any field
         if (!email || !password) {
-            return res.send({ message: "please fill the required field", success: false,});
+            return res.status(400).json({ message: "Please fill the required field", success: false });
         }
 
-        const checkexistuser = await userModel.findOne({ email });
-
-        if (!checkexistuser) {
-            //return res.send({message:"user does not exist", success:false}) now checking error with its status
+        const user = await userModel.findOne({ email });
+        if (!user) {
             return res.status(404).json({ message: "User does not exist", success: false });
         }
 
-        const checkpassword = await bcrypt.compare(password, checkexistuser.password);
-
-        if (!checkpassword) {
-            //return res.send({message: "password is incorrect", success:false}) now checking error with its status
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
             return res.status(401).json({ message: "Invalid password", success: false });
         }
 
-        const token = await jwt.sign({ _id: checkexistuser._id }, process.env.TOKEN_SECRET)
+       
+        const accessToken = jwt.sign(
+            { _id: user._id },
+            process.env.TOKEN_SECRET,
+            { expiresIn: "15m" }
+        );
 
-        if (!token) {
-            return res.send({ message: "token is not created", success: false })
-        }
+       
+        const refreshToken = jwt.sign(
+            { _id: user._id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: "7d" }
+        );
 
-        return res.cookie("token", token, {
-            httpOnly: true
-        }).send({ message: "user login successful", success: true })
+        
+        const salt = await bcrypt.genSalt(10);
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
+        user.token = hashedRefreshToken;
+        await user.save();
 
+        
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,        
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000 
+        });
 
-
-    } catch (error) {
-        console.log(error);
-        return res.send({ message: error.message, success: false })
-    }
-}
-
-export const Signup = async (req, res) => {
-
-    //console.log(req.body)
-    try {
-        const { name, email, password } = req.body;
-
-        // checking if user is missing any field
-        if (!email || !name || !password) {
-            return res.send({ message: "please fill the required field", success: false});
-        }
-
-        // checking if the user already exist
-        const checkexistuser = await userModel.findOne({ email });
-        if (checkexistuser) {
-            // return res.send({ message: "user already exist", success: false });
-            return res.status(401).json({ message: "user already exist", success: false });
-        }
-
-        // random string that is being added to password
-        const salt = await bcrypt.genSalt(10)
-        // using bcrypt to store encrypted password
-        const hashpassword = await bcrypt.hash(password, salt)
-
-        // creating new user
-        const newuser = new userModel({
-            name,
-            email,
-            password: hashpassword
-        })
-
-        await newuser.save();
-
-        // created token for user
-        const token = await jwt.sign({ _id: newuser._id }, process.env.TOKEN_SECRET)
-
-        console.log(token)
-
-        if (!token) {
-            return res.send({ message: "token is not created", success: false })
-        }
-
-        return res.cookie("token", token, {
-            httpOnly: true
-        }).send({ message: "user created successfully", success: true })
+        return res.status(200).json({
+            message: "User login successful",
+            success: true,
+            token: accessToken
+        });
 
     } catch (error) {
-        console.log(error);
-        return res.send({ message: error.message, success: false })
+        console.error(error);
+        return res.status(500).json({ message: error.message, success: false });
     }
-}
+};
 
-// Simplified profile function - middleware handles token verification
+
 export const getProfile = async (req, res) => {
     try {
-        // User is already verified by middleware and available in req.user
-        const user = req.user;
-        
-        return res.json({ message: "Profile fetched successfully", success: true,
+        const user = req.user; 
+        return res.status(200).json({
+            message: "Profile fetched successfully",
+            success: true,
             user: {
                 name: user.name,
                 email: user.email
@@ -108,10 +112,43 @@ export const getProfile = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ 
-            message: error.message, 
-            success: false 
-        });
+        console.error(error);
+        return res.status(500).json({ message: error.message, success: false });
     }
-}
+};
+
+
+export const refreshAccessToken = async (req, res) => {
+    try {
+        const token = req.cookies.refreshToken;
+
+        if (!token) {
+            return res.status(401).json({ message: "No refresh token found", success: false });
+        }
+
+        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        const user = await userModel.findById(decoded._id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+
+        const newAccessToken = jwt.sign(
+            { _id: user._id },
+            process.env.TOKEN_SECRET,
+            { expiresIn: "15m" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            token: newAccessToken
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ message: "Invalid or expired refresh token", success: false });
+    }
+};
+
+

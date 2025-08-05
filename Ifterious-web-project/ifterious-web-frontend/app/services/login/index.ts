@@ -1,3 +1,5 @@
+import { setToken } from '../auth';
+
 export const login = async (payload: {
     email: string,
     password: string
@@ -11,7 +13,6 @@ export const login = async (payload: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-        credentials: 'include' 
     });
     
     console.log("response", response)
@@ -21,6 +22,11 @@ export const login = async (payload: {
     if (!response.ok) {
         console.log("Login API error:", data); 
         throw new Error(data.message || "Login failed");
+    }
+    
+    // store token in localStorage if login is successful
+    if (data.success && data.token) {
+        setToken(data.token);
     }
     
     return data;
