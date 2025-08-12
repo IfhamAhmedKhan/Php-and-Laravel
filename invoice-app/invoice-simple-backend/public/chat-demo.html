@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Demo (Builder ↔ Tradie)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+    .row { display: flex; gap: 8px; margin-bottom: 8px; }
+    input, button { padding: 8px; }
+    .log { height: 220px; overflow: auto; background: #fafafa; border: 1px solid #eee; padding: 8px; }
+    .ok { color: green; }
+    .err { color: #b00020; }
+    small.mono { font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>Chat Demo (Builder ↔ Tradie)</h2>
+  <p>Use this page to sign up/login two users and test messaging. Server must run at <strong>http://localhost:9001</strong>.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Builder</h3>
+      <div class="row">
+        <input id="bName" placeholder="Full name" value="Alice Builder" />
+      </div>
+      <div class="row">
+        <input id="bEmail" placeholder="Email" value="alice.builder@example.com" />
+      </div>
+      <div class="row">
+        <input id="bPhone" placeholder="Phone" value="0400000001" />
+      </div>
+      <div class="row">
+        <input id="bPass" placeholder="Password" value="Passw0rd!" />
+      </div>
+      <div class="row">
+        <button id="bSignup">Signup (Builder)</button>
+        <button id="bLogin">Login</button>
+      </div>
+      <div class="row">
+        <small class="mono">userId: <span id="bUserId">-</span></small>
+      </div>
+      <div class="row">
+        <small class="mono">token: <span id="bToken">-</span></small>
+      </div>
+      <div class="row">
+        <input id="bMsg" placeholder="Message from Builder" />
+        <button id="bSend">Send</button>
+      </div>
+      <div class="log" id="bLog"></div>
+    </div>
+
+    <div class="card">
+      <h3>Tradie</h3>
+      <div class="row">
+        <input id="tName" placeholder="Full name" value="Tom Tradie" />
+      </div>
+      <div class="row">
+        <input id="tEmail" placeholder="Email" value="tom.tradie@example.com" />
+      </div>
+      <div class="row">
+        <input id="tPhone" placeholder="Phone" value="0400000002" />
+      </div>
+      <div class="row">
+        <input id="tPass" placeholder="Password" value="Passw0rd!" />
+      </div>
+      <div class="row">
+        <button id="tSignup">Signup (Tradie)</button>
+        <button id="tLogin">Login</button>
+      </div>
+      <div class="row">
+        <small class="mono">userId: <span id="tUserId">-</span></small>
+      </div>
+      <div class="row">
+        <small class="mono">token: <span id="tToken">-</span></small>
+      </div>
+      <div class="row">
+        <input id="tMsg" placeholder="Message from Tradie" />
+        <button id="tSend">Send</button>
+      </div>
+      <div class="log" id="tLog"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>Conversation</h3>
+    <div class="row">
+      <button id="createConv">Create Builder↔Tradie Conversation</button>
+    </div>
+    <div class="row">
+      <small class="mono">conversationId: <span id="convId">-</span></small>
+    </div>
+    <div class="log" id="convLog"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const API = 'http://localhost:9001';
+
+    let builder = { token: null, userId: null, socket: null };
+    let tradie  = { token: null, userId: null, socket: null };
+    let conversationId = null;
+
+    const el = (id) => document.getElementById(id);
+    const log = (which, msg, ok = true) => {
+      const target = el(which);
+      const d = document.createElement('div');
+      d.className = ok ? 'ok' : 'err';
+      d.textContent = msg;
+      target.appendChild(d);
+      target.scrollTop = target.scrollHeight;
+    };
+
+    function renderState() {
+      el('bUserId').textContent = builder.userId || '-';
+      el('bToken').textContent = builder.token ? builder.token.slice(0, 12) + '…' : '-';
+      el('tUserId').textContent = tradie.userId || '-';
+      el('tToken').textContent = tradie.token ? tradie.token.slice(0, 12) + '…' : '-';
+      el('convId').textContent = conversationId || '-';
+    }
+
+    async function req(path, method, body, token) {
+      const res = await fetch(API + path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.status === false) {
+        throw new Error(json.message || ('HTTP ' + res.status));
+      }
+      return json.data || json; // controllers wrap under data
+    }
+
+    async function signup(role, name, email, phone, pass) {
+      return req('/auth/signup', 'POST', {
+        fullName: name,
+        email,
+        phoneNumber: phone,
+        password: pass,
+        role // "Builder" or "Tradie"
+      });
+    }
+
+    async function login(email, pass) {
+      return req('/auth/login', 'POST', { email, password: pass });
+    }
+
+    function connectSocket(who) {
+      if (!who.token) return;
+      if (who.socket) who.socket.disconnect();
+      const socket = io(API, { auth: { token: who.token } });
+      const target = (who === builder) ? 'bLog' : 'tLog';
+      socket.on('connect', () => log(target, 'Socket connected'));
+      socket.on('disconnect', () => log(target, 'Socket disconnected', false));
+      socket.on('newMessage', (m) => {
+        const when = m.createdAt ? new Date(m.createdAt).toLocaleTimeString() : '';
+        log(target, `[${when}] ${m.text}`);
+      });
+      who.socket = socket;
+      if (conversationId) socket.emit('joinConversation', conversationId);
+    }
+
+    el('bSignup').onclick = async () => {
+      try {
+        const data = await signup('Builder', el('bName').value, el('bEmail').value, el('bPhone').value, el('bPass').value);
+        builder.token = data.accessToken; builder.userId = data.user._id;
+        renderState(); connectSocket(builder);
+        log('bLog', 'Signed up as Builder');
+      } catch (e) { log('bLog', e.message, false); }
+    };
+    el('tSignup').onclick = async () => {
+      try {
+        const data = await signup('Tradie', el('tName').value, el('tEmail').value, el('tPhone').value, el('tPass').value);
+        tradie.token = data.accessToken; tradie.userId = data.user._id;
+        renderState(); connectSocket(tradie);
+        log('tLog', 'Signed up as Tradie');
+      } catch (e) { log('tLog', e.message, false); }
+    };
+
+    el('bLogin').onclick = async () => {
+      try {
+        const data = await login(el('bEmail').value, el('bPass').value);
+        builder.token = data.accessToken; builder.userId = data.user._id;
+        renderState(); connectSocket(builder);
+        log('bLog', 'Logged in as Builder');
+      } catch (e) { log('bLog', e.message, false); }
+    };
+    el('tLogin').onclick = async () => {
+      try {
+        const data = await login(el('tEmail').value, el('tPass').value);
+        tradie.token = data.accessToken; tradie.userId = data.user._id;
+        renderState(); connectSocket(tradie);
+        log('tLog', 'Logged in as Tradie');
+      } catch (e) { log('tLog', e.message, false); }
+    };
+
+    el('createConv').onclick = async () => {
+      try {
+        if (!builder.token || !tradie.userId) throw new Error('Login Builder and Tradie first');
+        const data = await req('/chat/conversations', 'POST', { participantId: tradie.userId }, builder.token);
+        conversationId = data._id; renderState();
+        if (builder.socket) builder.socket.emit('joinConversation', conversationId);
+        if (tradie.socket) tradie.socket.emit('joinConversation', conversationId);
+        el('convLog').textContent = 'Conversation ready';
+      } catch (e) { el('convLog').textContent = e.message; }
+    };
+
+    el('bSend').onclick = async () => {
+      try {
+        if (!conversationId) throw new Error('Create conversation first');
+        await req('/chat/messages', 'POST', { conversationId, text: el('bMsg').value }, builder.token);
+        el('bMsg').value = '';
+      } catch (e) { log('bLog', e.message, false); }
+    };
+    el('tSend').onclick = async () => {
+      try {
+        if (!conversationId) throw new Error('Create conversation first');
+        await req('/chat/messages', 'POST', { conversationId, text: el('tMsg').value }, tradie.token);
+        el('tMsg').value = '';
+      } catch (e) { log('tLog', e.message, false); }
+    };
+  </script>
+</body>
+</html>
+

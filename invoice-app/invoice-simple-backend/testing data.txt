@@ -1,0 +1,88 @@
+{
+    "status": true,
+    "message": "User registered successfully",
+    "heading": "Authentication",
+    "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk3NDFlYWJmMjhiNjNhODQxMTExMmYiLCJhY2Nlc3NUb2tlbklkIjoiNjg5NzQxZWJiZjI4YjYzYTg0MTExMTM0IiwiY2xpZW50SWQiOiI1ZDVmZTM3Njk5Zjg2NTAwMzEwNzdhNWEiLCJjbGllbnRTZWNyZXQiOiI0MmYxMWRlZjg5ZjFjMDhmMjNmYWVjNzY0YWI0YzJlNzQzNmQzMmY5Iiwic2NvcGVzIjpbInZpZXctZGFzaGJvYXJkIiwic3lzdGVtLWxvZ3MiXSwiaWF0IjoxNzU0NzQzMjc1LCJleHAiOjE3NTQ3NDY4NzV9.cJR78NiJmWwXEWwsIwAEBypHcTmtlmC-3v8F5KGFtaA",
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk3NDFlYWJmMjhiNjNhODQxMTExMmYiLCJjbGllbnRJZCI6IjVkNWZlMzc2OTlmODY1MDAzMTA3N2E1YSIsImNsaWVudFNlY3JldCI6IjQyZjExZGVmODlmMWMwOGYyM2ZhZWM3NjRhYjRjMmU3NDM2ZDMyZjkiLCJzY29wZXMiOlsidmlldy1kYXNoYm9hcmQiLCJzeXN0ZW0tbG9ncyJdLCJpYXQiOjE3NTQ3NDMyNzUsImV4cCI6MTc1NDc2MTI3NX0.RG61Q_Ph6FYzTXjvbFfv6P0oIGUfEY8Hv6FhFdjRL7U",
+        "expiresIn": "2025-08-09T12:41:16.496Z",
+        "isPhoneNumberValidated": false,
+        "isEmailValidated": false,
+        "user": {
+            "_id": "689741eabf28b63a8411112f",
+            "fullName": "Alice Builder",
+            "roleId": "5d441507fee606eed0f233fe",
+            "email": "alice.builder@example.com",
+            "phoneNumber": "0400000001",
+            "roleName": "Builder",
+            "notifications": true,
+            "preferredLanguage": "english",
+            "createdAt": "2025-08-09T12:41:14.785Z",
+            "loginAt": "2025-08-09T12:41:14.785Z",
+            "isManuallyCreated": false,
+            "isPasswordCreated": true
+        }
+    }
+}
+-----------------
+    {
+      "fullName": "Alice Builder",
+      "email": "alice.builder@example.com",
+      "phoneNumber": "0400000001",
+      "password": "Passw0rd!",
+      "role": "Builder"
+    }
+-------------------
+
+
+TRADIE WORK
+
+-------------
+{
+    "status": true,
+    "message": "User registered successfully",
+    "heading": "Authentication",
+    "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk3NDNiMzBkOTBhNmZhMzVjYjI0YzciLCJhY2Nlc3NUb2tlbklkIjoiNjg5NzQzYjQwZDkwYTZmYTM1Y2IyNGNjIiwiY2xpZW50SWQiOiI1ZDVmZTM3Njk5Zjg2NTAwMzEwNzdhNWEiLCJjbGllbnRTZWNyZXQiOiI0MmYxMWRlZjg5ZjFjMDhmMjNmYWVjNzY0YWI0YzJlNzQzNmQzMmY5Iiwic2NvcGVzIjpbInZpZXctZGFzaGJvYXJkIiwic3lzdGVtLWxvZ3MiXSwiaWF0IjoxNzU0NzQzNzMzLCJleHAiOjE3NTQ3NDczMzN9.c_g-bHiJQP2KhUtAzk3hiZBtpyE9lph8VWXA1CNPsrc",
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODk3NDNiMzBkOTBhNmZhMzVjYjI0YzciLCJjbGllbnRJZCI6IjVkNWZlMzc2OTlmODY1MDAzMTA3N2E1YSIsImNsaWVudFNlY3JldCI6IjQyZjExZGVmODlmMWMwOGYyM2ZhZWM3NjRhYjRjMmU3NDM2ZDMyZjkiLCJzY29wZXMiOlsidmlldy1kYXNoYm9hcmQiLCJzeXN0ZW0tbG9ncyJdLCJpYXQiOjE3NTQ3NDM3MzMsImV4cCI6MTc1NDc2MTczM30.QDOWzzVLgTlC6S1mGRJ1Ppc8onUWZwPghKaMklzzWg0",
+        "expiresIn": "2025-08-09T12:48:53.735Z",
+        "isPhoneNumberValidated": false,
+        "isEmailValidated": false,
+        "user": {
+            "_id": "689743b30d90a6fa35cb24c7",
+            "fullName": "Tom Tradie",
+            "roleId": "5d441507fee606eed0f233e0",
+            "email": "tom.tradie@example.com",
+            "phoneNumber": "0400000002",
+            "roleName": "Tradie",
+            "notifications": true,
+            "preferredLanguage": "english",
+            "createdAt": "2025-08-09T12:48:51.833Z",
+            "loginAt": "2025-08-09T12:48:51.833Z",
+            "isManuallyCreated": false,
+            "isPasswordCreated": true
+        }
+    }
+}
+
+-------------
+  {
+    "fullName": "Tom Tradie",
+    "email": "tom.tradie@example.com",
+    "phoneNumber": "0400000002",
+    "password": "Passw0rd!",
+    "role": "Tradie"
+  }
+-------------
+
+http://localhost:9001/chat-demo.html
+
+
+
+
+
+
+
+
+
+
